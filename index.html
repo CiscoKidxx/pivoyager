@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>9.html</title>
+		<style type="text/css">
+		  html, body, #map-canvas { height: 500px; width: 900px; margin: 0; padding: 0;}
+		</style>
+
+		<script type="text/javascript"
+		  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD80zw7bMpGi1iSS_eL_R0RktTaxCl_ovo">
+		</script>
+
+		<script src="/socket.io/socket.io.js"></script>
+
+		<script type="text/javascript">
+		var map;
+		function initialize() {
+
+		  var mapOptions = {
+		    zoom: 8
+		  };
+		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+		}
+
+		function setMap() {
+		  if ((document.getElementById('latitude') != '') && (document.getElementById('longitude') != '')) {
+		    map.setCenter(new google.maps.LatLng(
+		      parseFloat(document.getElementById('latitude').innerHTML),
+		      parseFloat(document.getElementById('longitude').innerHTML)));
+		  }
+
+		  var my_LatLng = new google.maps.LatLng(
+			  parseFloat(document.getElementById('latitude').innerHTML),
+			  parseFloat(document.getElementById('longitude').innerHTML)
+		  );
+
+		  var marker = new google.maps.Marker({
+      		position: my_LatLng,
+      		map: map,
+      		title: 'Pi-Voyager'
+  			});
+
+
+		}
+		google.maps.event.addDomListener(window, 'load', initialize);
+		</script>
+	</head>
+
+	<body>
+
+		<h1>PiVoyager.com</h1>
+
+		<div style="width: 1200px" text-align: "center">
+		<div style="float: left">
+
+		<h5>Temp:</h5>
+		<div id="temp"></div>
+
+		<h5>Latitude</h5>
+		<div id="latitude"></div>
+
+		<h5>Longitude</h5>
+		<div id="longitude"></div>
+
+		<h5>Altitude</h5>
+		<div id="altitude"></div>
+
+		<h5>Pressure</h5>
+		<div id="pressure"></div>
+
+		<h5>Speed</h5>
+		<div id="speed"></div>
+
+		<h5>Track</h5>
+		<div id="track"></div>
+
+		</div>
+
+		<div id="map-canvas" style="float: left"></div>
+
+		<script>
+
+		var socket = io.connect("/");
+
+		socket.on("connect", function() {
+			console.log("connected");
+		});
+
+		socket.on("disconnect", function() {
+			console.log("disconnected");
+		});
+
+		socket.on("web_temp", function(msg) {
+			document.getElementById("temp").innerHTML = msg
+		})
+
+		socket.on("web_latitude", function (msg) {
+		  document.getElementById("latitude").innerHTML = msg;
+		  setMap();
+		});
+
+		socket.on("web_longitude", function (msg) {
+		  document.getElementById("longitude").innerHTML = msg;
+		  setMap();
+		});
+
+		socket.on("web_altitude", function(msg) {
+			document.getElementById("altitude").innerHTML = msg
+		})
+
+		socket.on("web_pressure", function(msg) {
+			document.getElementById("pressure").innerHTML = msg
+		})
+
+		socket.on("web_speed", function(msg) {
+			document.getElementById("speed").innerHTML = msg
+		})
+
+		socket.on("web_track", function(msg) {
+			document.getElementById("track").innerHTML = msg
+		})
+
+		</script>
+
+	</body>
+
+</html>
